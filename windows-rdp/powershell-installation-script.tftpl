@@ -37,12 +37,13 @@ catch {
     Install-Module -Name $moduleName -RequiredVersion $moduleVersion -Force
 }
 
-# Construct the module path for system-wide installation
-$moduleBasePath = "C:\Windows\system32\config\systemprofile\Documents\PowerShell\Modules\$moduleName\$moduleVersion"
-$modulePath = Join-Path -Path $moduleBasePath -ChildPath "$moduleName.psd1"
+# # Construct the module path for system-wide installation
+# $moduleBasePath = "C:\Windows\system32\config\systemprofile\Documents\PowerShell\Modules\$moduleName\$moduleVersion"
+# $modulePath = Join-Path -Path $moduleBasePath -ChildPath "$moduleName.psd1"
 
-# Import the module using the full path
-Import-Module $modulePath
+# # Import the module using the full path
+# Import-Module $modulePath
+Import-Module $moduleName
 Install-DGatewayPackage
 
 # Configure Devolutions Gateway
