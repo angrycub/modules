@@ -2,6 +2,7 @@ function Set-AdminPassword {
     param (
         [string]$adminPassword
     )
+    Write-Host "Setting Admin Password..."
     # Set admin password
     Get-LocalUser -Name "${admin_username}" | Set-LocalUser -Password (ConvertTo-SecureString -AsPlainText $adminPassword -Force)
     # Enable admin user
@@ -9,6 +10,8 @@ function Set-AdminPassword {
 }
 
 function Configure-RDP {
+    Write-Host "Configuring RDP Settings..."
+
     # Enable RDP
     New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0 -PropertyType DWORD -Force
     # Disable NLA
@@ -16,6 +19,8 @@ function Configure-RDP {
     New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "SecurityLayer" -Value 1 -PropertyType DWORD -Force
     # Enable RDP through Windows Firewall
     Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    Write-Host "End of RDP Configuration."
+
 }
 
 function Install-DevolutionsGateway {
@@ -38,8 +43,11 @@ catch {
 }
 
 # # Construct the module path for system-wide installation
-# $moduleBasePath = "C:\Windows\system32\config\systemprofile\Documents\PowerShell\Modules\$moduleName\$moduleVersion"
-# $modulePath = Join-Path -Path $moduleBasePath -ChildPath "$moduleName.psd1"
+$moduleBasePath = "C:\Windows\system32\config\systemprofile\Documents\PowerShell\Modules\$moduleName\$moduleVersion"
+$modulePath = Join-Path -Path $moduleBasePath -ChildPath "$moduleName.psd1"
+
+Write-Host "$$moduleBasePath: $moduleBasePath"
+Write-Host "$$modulePath: $moduleBasePath"
 
 # # Import the module using the full path
 # Import-Module $modulePath
@@ -60,6 +68,7 @@ New-DGatewayProvisionerKeyPair -Force
 
 # Configure and start the Windows service
 Set-Service 'DevolutionsGateway' -StartupType 'Automatic'
+Write-Host "Starting DevolutionsGateway Service..."
 Start-Service 'DevolutionsGateway'
 }
 
@@ -76,9 +85,19 @@ ${patch_file_contents}
 # Only inject the src if we have not before.
 $isPatched = Select-String -Path "$devolutionsHtml" -Pattern "$patch" -SimpleMatch
 if ($isPatched -eq $null) {
+    Write-Host -NoNewLine "Patching Devolutions HTML..."
     (Get-Content $devolutionsHtml).Replace('</app-root>', "</app-root>$patch") | Set-Content $devolutionsHtml
+    $isPatched = Select-String -Path "$devolutionsHtml" -Pattern "$patch" -SimpleMatch
+      if ($isPatched) -eq $null {
+        Write-Host " ERROR."
+        throw "Patch not found after applying."
+      }
+      Write-Host " Done."
 }
 }
+
+$file = "%SystemRoot%\System32\EventCreate.exe"
+New-EventLog -Source Coder -LogName Application -MessageResourceFile $file -CategoryResourceFile $file
 
 Set-AdminPassword -adminPassword "${admin_password}"
 Configure-RDP
