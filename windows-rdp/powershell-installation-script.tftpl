@@ -1,3 +1,28 @@
+function Log {
+    [CmdletBinding(DefaultParameterSetName = 'Log')]
+    param (
+        [Parameter(Mandatory, ParameterSetName = 'Log', Position = 0)]
+        [Parameter(Mandatory, ParameterSetName = 'LogAndEvent', Position = 0)]
+        [Parameter(Mandatory,
+        HelpMessage="You must supply a message to be logged.")]
+        [string]$Message,
+        [ValidateSet("Error", "Information", "FailureAudit", "SuccessAudit", "Warning")]
+        [string]$Level = "Information",
+        [Parameter(Mandatory, ParameterSetName = 'LogAndEvent')]
+        [switch]$WriteEvent,
+        [Parameter(ParameterSetName = 'LogAndEvent')]
+        [ValidateRange(0,65535)]
+        [int]$EventId = 0
+    )
+    $txtLevel = $Level
+    if ($txtLevel -eq "Information") {
+        $txtLevel = "Info "
+    }
+    Write-Host "$(Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffff") [$txtLevel] $Message"
+    if ($WriteEvent) {
+        Write-EventLog -Source "Coder" -LogName "Application"  -Message "$Message" -EntryType "Level"
+    }
+}
 function Set-AdminPassword {
     param (
         [string]$adminPassword
