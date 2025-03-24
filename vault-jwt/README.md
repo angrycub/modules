@@ -10,10 +10,11 @@ tags: [helper, integration, vault, jwt, oidc]
 
 # Hashicorp Vault Integration (JWT)
 
-This module lets you authenticate with [Hashicorp Vault](https://www.vaultproject.io/) in your Coder workspaces by reusing the [OIDC](https://coder.com/docs/admin/auth#openid-connect) access token from Coder's OIDC authentication method. This requires configuring the Vault [JWT/OIDC](https://developer.hashicorp.com/vault/docs/auth/jwt#configuration) auth method.
+This module lets you authenticate with [Hashicorp Vault](https://www.vaultproject.io/) in your Coder workspaces by reusing the [OIDC](https://coder.com/docs/admin/users/oidc-auth) access token from Coder's OIDC authentication method. This requires configuring the Vault [JWT/OIDC](https://developer.hashicorp.com/vault/docs/auth/jwt#configuration) auth method.
 
 ```tf
 module "vault" {
+  count          = data.coder_workspace.me.start_count
   source         = "registry.coder.com/modules/vault-jwt/coder"
   version        = "1.0.20"
   agent_id       = coder_agent.example.id
@@ -40,6 +41,7 @@ curl -H "X-Vault-Token: ${VAULT_TOKEN}" -X GET "${VAULT_ADDR}/v1/coder/secrets/d
 
 ```tf
 module "vault" {
+  count               = data.coder_workspace.me.start_count
   source              = "registry.coder.com/modules/vault-jwt/coder"
   version             = "1.0.20"
   agent_id            = coder_agent.example.id
@@ -55,6 +57,7 @@ module "vault" {
 data "coder_workspace_owner" "me" {}
 
 module "vault" {
+  count          = data.coder_workspace.me.start_count
   source         = "registry.coder.com/modules/vault-jwt/coder"
   version        = "1.0.20"
   agent_id       = coder_agent.example.id
@@ -67,6 +70,7 @@ module "vault" {
 
 ```tf
 module "vault" {
+  count             = data.coder_workspace.me.start_count
   source            = "registry.coder.com/modules/vault-jwt/coder"
   version           = "1.0.20"
   agent_id          = coder_agent.example.id

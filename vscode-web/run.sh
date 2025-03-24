@@ -59,8 +59,15 @@ case "$ARCH" in
     ;;
 esac
 
-HASH=$(curl -fsSL https://update.code.visualstudio.com/api/commits/stable/server-linux-$ARCH-web | cut -d '"' -f 2)
-output=$(curl -fsSL https://vscode.download.prss.microsoft.com/dbazure/download/stable/$HASH/vscode-server-linux-$ARCH-web.tar.gz | tar -xz -C ${INSTALL_PREFIX} --strip-components 1)
+# Check if a specific VS Code Web commit ID was provided
+if [ -n "${COMMIT_ID}" ]; then
+  HASH="${COMMIT_ID}"
+else
+  HASH=$(curl -fsSL https://update.code.visualstudio.com/api/commits/stable/server-linux-$ARCH-web | cut -d '"' -f 2)
+fi
+printf "$${BOLD}VS Code Web commit id version $HASH.\n"
+
+output=$(curl -fsSL "https://vscode.download.prss.microsoft.com/dbazure/download/stable/$HASH/vscode-server-linux-$ARCH-web.tar.gz" | tar -xz -C "${INSTALL_PREFIX}" --strip-components 1)
 
 if [ $? -ne 0 ]; then
   echo "Failed to install Microsoft Visual Studio Code Server: $output"
@@ -92,7 +99,8 @@ if [ "${AUTO_INSTALL_EXTENSIONS}" = true ]; then
 
     if [ -f "$WORKSPACE_DIR/.vscode/extensions.json" ]; then
       printf "🧩 Installing extensions from %s/.vscode/extensions.json...\n" "$WORKSPACE_DIR"
-      extensions=$(jq -r '.recommendations[]' "$WORKSPACE_DIR"/.vscode/extensions.json)
+      # Use sed to remove single-line comments before parsing with jq
+      extensions=$(sed 's|//.*||g' "$WORKSPACE_DIR"/.vscode/extensions.json | jq -r '.recommendations[]')
       for extension in $extensions; do
         $VSCODE_WEB "$EXTENSION_ARG" --install-extension "$extension" --force
       done

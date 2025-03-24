@@ -17,8 +17,9 @@ Under the hood, this module uses the [coder dotfiles](https://coder.com/docs/v2/
 
 ```tf
 module "dotfiles" {
+  count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/modules/dotfiles/coder"
-  version  = "1.0.18"
+  version  = "1.0.29"
   agent_id = coder_agent.example.id
 }
 ```
@@ -29,8 +30,9 @@ module "dotfiles" {
 
 ```tf
 module "dotfiles" {
+  count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/modules/dotfiles/coder"
-  version  = "1.0.18"
+  version  = "1.0.29"
   agent_id = coder_agent.example.id
 }
 ```
@@ -39,8 +41,9 @@ module "dotfiles" {
 
 ```tf
 module "dotfiles" {
+  count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/modules/dotfiles/coder"
-  version  = "1.0.18"
+  version  = "1.0.29"
   agent_id = coder_agent.example.id
   user     = "root"
 }
@@ -50,14 +53,16 @@ module "dotfiles" {
 
 ```tf
 module "dotfiles" {
+  count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/modules/dotfiles/coder"
-  version  = "1.0.18"
+  version  = "1.0.29"
   agent_id = coder_agent.example.id
 }
 
 module "dotfiles-root" {
+  count        = data.coder_workspace.me.start_count
   source       = "registry.coder.com/modules/dotfiles/coder"
-  version      = "1.0.18"
+  version      = "1.0.29"
   agent_id     = coder_agent.example.id
   user         = "root"
   dotfiles_uri = module.dotfiles.dotfiles_uri
@@ -70,8 +75,9 @@ You can set a default dotfiles repository for all users by setting the `default_
 
 ```tf
 module "dotfiles" {
+  count                = data.coder_workspace.me.start_count
   source               = "registry.coder.com/modules/dotfiles/coder"
-  version              = "1.0.18"
+  version              = "1.0.29"
   agent_id             = coder_agent.example.id
   default_dotfiles_uri = "https://github.com/coder/dotfiles"
 }
